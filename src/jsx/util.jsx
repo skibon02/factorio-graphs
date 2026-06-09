@@ -2,7 +2,7 @@ import React from "react";
 
 function resourceIconUrl(rcname) {
     const baseUrl = import.meta.env.BASE_URL;
-    return `${baseUrl}satis-rc/${rcname}.webp`;
+    return `${baseUrl}factorio-rc/${rcname}.png`;
 }
 
 function RcImage({ rcname }) {

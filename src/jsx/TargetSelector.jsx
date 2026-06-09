@@ -1,20 +1,20 @@
 import React from "react";
-import { all_recipes, get_all_known_resources } from "../satis/calculator";
+import { all_recipes, get_all_known_resources } from "../data/calculator";
 import ResourceRateInput from "./ResourceRateInput";
 import { useMemo } from "react";
-import { sources } from "../satis/recipes_db";
+import { sources } from "../data/recipes_db";
 import Select from 'react-select';
-import {RcImage} from "./util.jsx"
+import { RcImage } from "./util.jsx"
 
-function TargetSelector({targetResources, setTargetResources}) {
+function TargetSelector({ targetResources, setTargetResources }) {
     let targetSelectorItems = Object.entries(targetResources).map(([name, rate]) => {
         return <div key={name}>
-            <ResourceRateInput rcname={name} rate={rate} setRate={(new_rate)=>{
+            <ResourceRateInput rcname={name} rate={rate} setRate={(new_rate) => {
                 let new_rc = Object.assign({}, targetResources);
                 new_rc[name] = new_rate;
                 setTargetResources(new_rc);
-            }}/>
-            <p 
+            }} />
+            <p
                 className="delete-btn"
                 onClick={() => {
                     let new_rc = Object.assign({}, targetResources);
@@ -31,15 +31,15 @@ function TargetSelector({targetResources, setTargetResources}) {
             return rcname.replaceAll(/\-/gi, " ")
         }
         return all_resources.filter((r) => !sources.includes(r))
-        .map(r=>{return {value: r, label: get_rc_name(r)}});
+            .map(r => { return { value: r, label: get_rc_name(r) } });
     }, []);
-    
+
     return (
         <div className="target-selector">
             <p>Select target resources</p>
             <div>
                 {targetSelectorItems}
-                <Select 
+                <Select
                     placeholder="+ Add new target"
                     classNames={{
                         control: () => 'add-target-resource',
@@ -58,19 +58,19 @@ function TargetSelector({targetResources, setTargetResources}) {
                             alert("Incorrect resource name: " + name);
                             return;
                         }
-                        let rate = +prompt("Enter desired production rate per minute");
+                        let rate = +prompt("Enter desired production rate per second");
                         if (!rate) {
                             alert("Incorrect production rate: " + +rate);
                             return;
                         }
 
                         let prev_rate = +(targetResources[name] ?? 0);
-                        let res = {...targetResources};
+                        let res = { ...targetResources };
                         res[name] = prev_rate + rate;
                         setTargetResources(res);
 
                         return false;
-                    }} 
+                    }}
                     formatOptionLabel={item => {
                         let rcname = item.value;
                         return (
@@ -82,7 +82,7 @@ function TargetSelector({targetResources, setTargetResources}) {
                     }}
                     value={null}
                     options={all_resources}
-                    components={{ DropdownIndicator:() => null, IndicatorSeparator:() => null }}
+                    components={{ DropdownIndicator: () => null, IndicatorSeparator: () => null }}
                 />
             </div>
         </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import {check_all_recipes} from "../satis/calculator";
+import { check_all_recipes } from "../data/calculator";
 
 const missing_recipes = check_all_recipes();
 

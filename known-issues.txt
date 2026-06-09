@@ -1,13 +1,10 @@
 ## issues
-- не очищается стейт модификаторов при удалении нод рецептов (они вернутся если вернуть этот же рецепт)
-- В alt рецептах остаются старые рецепты пластика и мазута
-
-## low prio issues
-- нет различия между жидкостями и упакованными жидкостями
+- state modifiers not cleared when recipe nodes are removed
+- old alt recipes remain in some cases
 
 ## future improvements
-- умное разрешение рекурсии
-- кастомные базовые ресурсы
-- пресеты
-- переиспользовать вторичные ресурсы если они нужны для целевых
-- Глобальное управление редактируемыми параметрами (сбросить рецепты, сбросить/максимум энергомодулей, петлевиков)
+- smart recursion resolution
+- custom basic resources
+- presets
+- reuse secondary resources when needed for targets
+- global modifier management

@@ -118,8 +118,14 @@
 .top-modifiers > div {
   display: flex;
   align-items: center;
+  gap: .3em;
   font-weight: bold;
   color: orange;
+}
+
+.machine-icon {
+  width: 1.5em;
+  height: 1.5em;
 }
 
 .top-modifiers img {
@@ -130,4 +136,18 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.node-machine-select {
+  background-color: rgb(153, 184, 194);
+  border: none;
+  border-radius: .3em;
+  padding: .2em .3em;
+  font-size: .8em;
+  cursor: pointer;
+  outline: none;
+}
+
+.node-machine-select:hover {
+  background-color: rgb(120, 150, 160);
 }

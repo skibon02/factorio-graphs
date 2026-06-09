@@ -7,7 +7,7 @@ function ResourceRate({ rcname, rate }) {
   return (
     <div className="resource-rate-cont">
       <img src={resourceIconUrl(rcname)} />
-      <p>{rounded_rate} / min</p>
+      <p>{rounded_rate} / s</p>
     </div>
   );
 }

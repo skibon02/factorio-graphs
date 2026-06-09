@@ -1,8 +1,8 @@
 import React, { memo } from "react";
 import Select from 'react-select';
-import { all_recipes } from "../satis/calculator";
+import { all_recipes } from "../data/calculator";
 import right_arrow from "../assets/right-arrow.png"
-import {RcImage} from "./util.jsx"
+import { RcImage } from "./util.jsx"
 
 
 let SelectedRecipes = memo(function SelectedRecipes({ selectedRecipes, selectRecipe }) {
@@ -12,16 +12,16 @@ let SelectedRecipes = memo(function SelectedRecipes({ selectedRecipes, selectRec
 
         return (
             <div key={name}>
-                <RcImage rcname={name}/>
-                <Select 
+                <RcImage rcname={name} />
+                <Select
                     classNames={{
                         control: (state) => 'selected',
                         option: (state) => 'item',
                         menuList: (state) => 'container'
                     }}
                     formatOptionLabel={recipe => {
-                        let ing_imgs = Object.keys(recipe.ingredients).map((ing)=> {
-                            return <RcImage key={ing} rcname={ing}/>
+                        let ing_imgs = Object.keys(recipe.ingredients).map((ing) => {
+                            return <RcImage key={ing} rcname={ing} />
                         });
                         let output_imgs = [recipe.name];
                         if (recipe.name2) {
@@ -29,7 +29,7 @@ let SelectedRecipes = memo(function SelectedRecipes({ selectedRecipes, selectRec
                         }
 
                         output_imgs = output_imgs.map(name => {
-                            return <RcImage key={name} rcname={name}/>
+                            return <RcImage key={name} rcname={name} />
                         })
                         return <>
                             {ing_imgs}
@@ -37,16 +37,16 @@ let SelectedRecipes = memo(function SelectedRecipes({ selectedRecipes, selectRec
                             {output_imgs}
                         </>
                     }}
-                    onChange={(item)=> {
+                    onChange={(item) => {
                         let recipe_num = recipes.findIndex(el => el == item);
                         selectRecipe({
                             name,
                             recipe_num
                         });
                     }}
-                    getOptionValue={(option)=>{return option.output + Object.keys(option.ingredients).join("")}}
+                    getOptionValue={(option) => { return option.output + Object.keys(option.ingredients).join("") }}
                     value={recipe}
-                    options={recipes}/>
+                    options={recipes} />
             </div>
         )
     });

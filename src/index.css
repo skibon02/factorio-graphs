@@ -262,3 +262,80 @@ img.icon {
   50%{background-position:100% 19%}
   100%{background-position:0% 82%}
 }
+
+.machine-defaults {
+  margin-top: .8em;
+  border-top: 1px solid white;
+  padding-top: .5em;
+}
+
+.defaults-title {
+  color: white;
+  font-weight: 700;
+  margin-bottom: .3em;
+}
+
+.default-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5em;
+  margin-bottom: .3em;
+}
+
+.default-selector span {
+  color: rgb(187, 177, 208);
+  font-size: .9em;
+}
+
+.default-selector select {
+  background-color: rgb(153, 184, 194);
+  border: none;
+  border-radius: .3em;
+  padding: .2em .3em;
+  font-size: .8em;
+  cursor: pointer;
+}
+
+.apply-all-toggle {
+  display: flex;
+  align-items: center;
+  gap: .4em;
+  margin-bottom: .5em;
+  cursor: pointer;
+}
+
+.apply-all-toggle span {
+  color: rgb(187, 177, 208);
+  font-size: .9em;
+}
+
+.apply-all-toggle input {
+  cursor: pointer;
+}
+
+.research-time {
+  margin-top: .5em;
+  border-top: 1px solid white;
+  padding-top: .5em;
+}
+
+.research-time-input {
+  background-color: rgb(153, 184, 194);
+  border: none;
+  border-radius: .3em;
+  padding: .2em .3em;
+  font-size: .8em;
+  width: 4em;
+  text-align: center;
+}
+
+.tech-select {
+  background-color: rgb(153, 184, 194);
+  border: none;
+  border-radius: .3em;
+  padding: .2em .3em;
+  font-size: .8em;
+  cursor: pointer;
+  max-width: 12em;
+}
