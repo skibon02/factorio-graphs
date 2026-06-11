@@ -142,6 +142,39 @@ const recipes = [
         "base": true
     },
     {
+        "name": "petroleum-gas",
+        "output": 85,
+        "crafting_time": 5,
+        "ingredients": {
+            "crude-oil": 100,
+            "water": 95
+        },
+        "machine": "oil-refinery",
+        "extra_outputs": [
+            { "name": "heavy-oil", "amount": 25 }
+        ],
+        "_split": [
+            {
+                "name": "heavy-oil",
+                "output": 25,
+                "crafting_time": 5,
+                "ingredients": { "crude-oil": 100, "water": 50 },
+                "machine": "oil-refinery",
+                "extra_outputs": [
+                    { "name": "light-oil", "amount": 45 },
+                    { "name": "petroleum-gas", "amount": 55 }
+                ]
+            },
+            {
+                "name": "petroleum-gas",
+                "output": 30,
+                "crafting_time": 3,
+                "ingredients": { "light-oil": 45, "water": 45 },
+                "machine": "chemical-plant"
+            }
+        ]
+    },
+    {
         "name": "heavy-oil",
         "output": 25,
         "crafting_time": 5,

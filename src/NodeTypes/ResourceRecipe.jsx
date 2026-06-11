@@ -55,21 +55,39 @@ function ResourceRecipe({ data, isConnectable }) {
             </div>
         });
 
+        // Show primary output as secondary when viewing through an extra output
+        if (recipe.name !== data.name) {
+            let prim_rate = recipe.output * rcinfo.rate / output_rate;
+            extra_outputs.push(
+                <div key={recipe.name} className='cont'>
+                    <Handle
+                        style={{ right: -30 }}
+                        id={'secondary-out-' + recipe.name}
+                        isConnectable={isConnectable}
+                        position={Position.Right}
+                        type='source' />
+                    <ResourceRate rcname={recipe.name} rate={prim_rate} />
+                </div>
+            );
+        }
+
         if (recipe.extra_outputs) {
-            extra_outputs = recipe.extra_outputs
-                .filter(eo => eo.name !== data.name)
-                .map(eo => {
-                    let sec_rate = eo.amount * rcinfo.rate / output_rate;
-                    return <div key={eo.name} className='cont'>
-                        <Handle
-                            style={{ right: -30 }}
-                            id={'secondary-out-' + output_name}
-                            isConnectable={isConnectable}
-                            position={Position.Right}
-                            type='source' />
-                        <ResourceRate rcname={eo.name} rate={sec_rate} />
-                    </div>;
-                });
+            extra_outputs = extra_outputs.concat(
+                recipe.extra_outputs
+                    .filter(eo => eo.name !== data.name)
+                    .map(eo => {
+                        let sec_rate = eo.amount * rcinfo.rate / output_rate;
+                        return <div key={eo.name} className='cont'>
+                            <Handle
+                                style={{ right: -30 }}
+                                id={'secondary-out-' + eo.name}
+                                isConnectable={isConnectable}
+                                position={Position.Right}
+                                type='source' />
+                            <ResourceRate rcname={eo.name} rate={sec_rate} />
+                        </div>;
+                    })
+            );
         }
     }
 
