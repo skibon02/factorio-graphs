@@ -2,6 +2,88 @@ import machines from './machines_db.js';
 import { recipes, sources } from './recipes_db.js'
 import resources from './resources_db.js'
 
+/**
+ * Build a recipe tree as a plain object for a given resource.
+ * Uses the default/base recipe at each step (no alt recipe selection).
+ * Pass selectRecipe(rcname, recipes_list) => recipe_index to override.
+ * Returns null for basic resources (sources).
+ *
+ * Example output for chemical-science-pack:
+ * {
+ *   name: "chemical-science-pack",
+ *   output: 2,
+ *   crafting_time: 24,
+ *   machine: "assembling-machine-1",
+ *   ingredients: {
+ *     "engine-unit": { name: "engine-unit", output: 1, ..., ingredients: { ... } },
+ *     "advanced-circuit": { ... },
+ *     "sulfur": { ... }
+ *   }
+ * }
+ */
+function buildRecipeTree(rcname, path = new Set(), selectRecipe = null) {
+    if (path.has(rcname)) {
+        return { _recursion: true, name: rcname };
+    }
+
+    let recipes_list = all_recipes(rcname);
+    if (recipes_list === "basic_resource") {
+        return null;
+    }
+
+    if (recipes_list.length === 0) {
+        return { _missing: true, name: rcname };
+    }
+
+    let recipe_num = 0;
+    if (selectRecipe && recipes_list.length > 1) {
+        recipe_num = selectRecipe(rcname, recipes_list);
+    }
+    let recipe = recipes_list[recipe_num];
+
+    let out_rate;
+    if (recipe.name === rcname) {
+        out_rate = recipe.output;
+    } else {
+        out_rate = recipe.extra_outputs.find(eo => eo.name === rcname).amount;
+    }
+
+    path.add(rcname);
+
+    let ingredients = {};
+    for (let ing in recipe.ingredients) {
+        let ing_rate = recipe.ingredients[ing] / out_rate;
+        let subtree = buildRecipeTree(ing, path, selectRecipe);
+        if (subtree) {
+            subtree._rate_per_output = ing_rate;
+        }
+        ingredients[ing] = subtree;
+    }
+
+    path.delete(rcname);
+
+    let result = {
+        name: recipe.name,
+        output: recipe.output,
+        crafting_time: recipe.crafting_time,
+        machine: recipe.machine,
+        ingredients,
+    };
+
+    if (recipe.extra_outputs) {
+        result.extra_outputs = recipe.extra_outputs;
+    }
+
+    // If we're looking at this recipe through an extra output, note the actual output rate
+    if (recipe.name !== rcname) {
+        result._via_extra_output = rcname;
+        result._output_rate = out_rate;
+    }
+
+    return result;
+}
+
+
 function get_all_known_resources() {
     let res = {};
 
@@ -11,8 +93,10 @@ function get_all_known_resources() {
     for (let recipe of recipes) {
         res[recipe.name] = true;
 
-        if (recipe.name2) {
-            res[recipe.name2] = true;
+        if (recipe.extra_outputs) {
+            for (let eo of recipe.extra_outputs) {
+                res[eo.name] = true;
+            }
         }
     }
 
@@ -36,8 +120,12 @@ function all_recipes(rcname) {
             res.push(recipe);
         }
 
-        if (rcname == recipe.name2) {
-            res.push(recipe);
+        if (recipe.extra_outputs) {
+            for (let eo of recipe.extra_outputs) {
+                if (rcname == eo.name) {
+                    res.push(recipe);
+                }
+            }
         }
     }
 
@@ -77,7 +165,12 @@ function traverseResource(rcname, select_recipe, rate = 0, for_each = (rcname, r
 
     for_each(rcname, recipe, rate, path);
 
-    let out_rate = recipe.name === rcname ? recipe.output : recipe.output2;
+    let out_rate;
+    if (recipe.name === rcname) {
+        out_rate = recipe.output;
+    } else {
+        out_rate = recipe.extra_outputs.find(eo => eo.name === rcname).amount;
+    }
 
     for (let ing in recipe.ingredients) {
         let ing_rate = rate / out_rate * recipe.ingredients[ing];
@@ -166,13 +259,15 @@ function get_all_recipes() {
                 position: { x: 300 + recipe_i * 600, y: ingcnt * 100 + vertical_offset },
                 data: { rcname: recipe.name, rate: recipe.output }
             })
-            if (recipe.name2) {
-                nodes.push({
-                    id: 'out2_' + cnt,
-                    type: 'TargetResource',
-                    position: { x: 300 + recipe_i * 600, y: ingcnt * 100 + vertical_offset + 100 },
-                    data: { rcname: recipe.name2, rate: recipe.output2 }
-                })
+            if (recipe.extra_outputs) {
+                for (let eo of recipe.extra_outputs) {
+                    nodes.push({
+                        id: 'extra_' + eo.name + '_' + cnt,
+                        type: 'TargetResource',
+                        position: { x: 300 + recipe_i * 600, y: ingcnt * 100 + vertical_offset + 100 },
+                        data: { rcname: eo.name, rate: eo.amount }
+                    })
+                }
             }
 
             for (let ing in recipe.ingredients) {
@@ -231,7 +326,8 @@ function getMachineFamily(name) {
     if (!name) return null;
     if (name.startsWith('assembling')) return 'assembling';
     if (name.includes('furnace')) return 'furnace';
-    if (name.includes('mining') || name === 'pumpjack' || name === 'offshore-pump') return 'mining';
+    if (name.includes('mining')) return 'mining';
+    if (name === 'pumpjack' || name === 'offshore-pump') return 'pumping';
     return null;
 }
 
@@ -290,7 +386,8 @@ function calculate(targetResources, cur_alt_recipes, selectedMachines, machineDe
                     // Source resource - calculate miners
                     let resource_info = resources[rc];
                     if (resource_info) {
-                        let machine_name = selectedMachines[rc] || machineDefaults.mining || resource_info.default_miner;
+                        let family = getMachineFamily(resource_info.default_miner);
+                        let machine_name = selectedMachines[rc] || (family && machineDefaults[family]) || resource_info.default_miner;
                         let machine = machines[machine_name];
                         let mining_speed = machine.crafting_speed;
                         let mining_time = resource_info.mining_time;
@@ -333,7 +430,12 @@ function calculate(targetResources, cur_alt_recipes, selectedMachines, machineDe
                 let crafting_speed = machine.crafting_speed;
 
                 // Items per second for this recipe at base speed
-                let primary_output = recipe.name === rc ? recipe.output : recipe.output2;
+                let primary_output;
+                if (recipe.name === rc) {
+                    primary_output = recipe.output;
+                } else {
+                    primary_output = recipe.extra_outputs.find(eo => eo.name === rc).amount;
+                }
                 let crafts_per_second = rate / primary_output;
                 // Research recipes use the global research time instead of their own crafting_time
                 let base_craft_time = recipe.machine === 'lab' ? researchTime : recipe.crafting_time;
@@ -382,4 +484,5 @@ export {
     check_all_recipes, get_all_recipes,
     initial_nodes, initial_edges, all_recipes,
     generateAltRecipes, calculate, get_all_known_resources,
+    buildRecipeTree,
 };

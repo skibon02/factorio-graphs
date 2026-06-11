@@ -20,11 +20,11 @@ const resources = {
         "default_miner": "electric-mining-drill"
     },
     "crude-oil": {
-        "mining_time": 1,
+        "mining_time": 0.1,
         "default_miner": "pumpjack"
     },
     "water": {
-        "mining_time": 1,
+        "mining_time": 0.016666666666666666,
         "default_miner": "offshore-pump"
     }
 };

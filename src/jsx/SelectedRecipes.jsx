@@ -24,8 +24,10 @@ let SelectedRecipes = memo(function SelectedRecipes({ selectedRecipes, selectRec
                             return <RcImage key={ing} rcname={ing} />
                         });
                         let output_imgs = [recipe.name];
-                        if (recipe.name2) {
-                            output_imgs.push(recipe.name2);
+                        if (recipe.extra_outputs) {
+                            for (let eo of recipe.extra_outputs) {
+                                output_imgs.push(eo.name);
+                            }
                         }
 
                         output_imgs = output_imgs.map(name => {

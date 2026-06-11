@@ -14,7 +14,8 @@ const family_labels = {
 function getFamily(name) {
     if (name.startsWith('assembling')) return 'assembling';
     if (name.includes('furnace')) return 'furnace';
-    if (name.includes('mining') || name === 'pumpjack' || name === 'offshore-pump') return 'mining';
+    if (name.includes('mining')) return 'mining';
+    if (name === 'pumpjack' || name === 'offshore-pump') return 'pumping';
     return null;
 }
 

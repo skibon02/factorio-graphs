@@ -150,8 +150,10 @@ const recipes = [
             "crude-oil": 100
         },
         "machine": "oil-refinery",
-        "name2": "light-oil",
-        "output2": 45,
+        "extra_outputs": [
+            { "name": "light-oil", "amount": 45 },
+            { "name": "petroleum-gas", "amount": 55 }
+        ],
         "base": true
     },
     {
@@ -164,8 +166,9 @@ const recipes = [
             "steam": 50
         },
         "machine": "oil-refinery",
-        "name2": "light-oil",
-        "output2": 20
+        "extra_outputs": [
+            { "name": "light-oil", "amount": 20 }
+        ]
     },
     {
         "name": "light-oil",
@@ -2115,8 +2118,9 @@ const recipes = [
             "uranium-ore": 10
         },
         "machine": "centrifuge",
-        "name2": "uranium-238",
-        "output2": 1,
+        "extra_outputs": [
+            { "name": "uranium-238", "amount": 1 }
+        ],
         "base": true
     },
     {
@@ -2128,8 +2132,9 @@ const recipes = [
             "uranium-238": 5
         },
         "machine": "centrifuge",
-        "name2": "uranium-238",
-        "output2": 2
+        "extra_outputs": [
+            { "name": "uranium-238", "amount": 2 }
+        ]
     },
     {
         "name": "nuclear-fuel",

@@ -231,26 +231,30 @@ function PageFactory() {
 
             let rate = rcinfo.rate;
             let recipe = rcinfo.recipe;
-            let recipe_output = rcname === recipe.name ? recipe.output : recipe.output2;
+            let recipe_output;
+            if (rcname === recipe.name) {
+                recipe_output = recipe.output;
+            } else {
+                recipe_output = recipe.extra_outputs.find(eo => eo.name === rcname).amount;
+            }
             let multiplier = rate / recipe_output;
 
             // secondary output check
-            if (rcname === recipe.name && recipe.name2 || rcname === recipe.name2 && recipe.name) {
-                let secondary_name = rcname === recipe.name ? recipe.name2 : recipe.name;
-                let secondary_output = rcname === recipe.name ? recipe.output2 : recipe.output;
+            if (recipe.extra_outputs) {
+                for (let eo of recipe.extra_outputs) {
+                    if (eo.name === rcname) continue;
+                    if (!secondaryOutputs[eo.name]) {
+                        secondaryOutputs[eo.name] = 0;
+                    }
+                    secondaryOutputs[eo.name] += eo.amount * multiplier;
 
-                if (!secondaryOutputs[secondary_name]) {
-                    secondaryOutputs[secondary_name] = 0;
+                    new_edges.push({
+                        id: 'secondary-out-' + rcname + 'secondary-' + eo.name,
+                        source: 'recipe-' + rcname,
+                        sourceHandle: 'secondary-out-' + rcname,
+                        target: 'secondary-' + eo.name,
+                    })
                 }
-                secondaryOutputs[secondary_name] += secondary_output * multiplier;
-
-                new_edges.push({
-                    id: 'secondary-out-' + rcname + 'secondary-' + secondary_name,
-                    source: 'recipe-' + rcname,
-                    sourceHandle: 'secondary-out-' + rcname,
-
-                    target: 'secondary-' + secondary_name,
-                })
             }
 
             for (let ing in recipe.ingredients) {

@@ -34,10 +34,15 @@ function ResourceRecipe({ data, isConnectable }) {
     let crafting_speed = machine.crafting_speed;
 
     let inputs = [];
-    let secondary_output_rate = null;
+    let extra_outputs = [];
 
     if (recipe) {
-        let output_rate = recipe.name == data.name ? recipe.output : recipe.output2;
+        let output_rate;
+        if (recipe.name == data.name) {
+            output_rate = recipe.output;
+        } else {
+            output_rate = recipe.extra_outputs.find(eo => eo.name === data.name).amount;
+        }
         inputs = Object.entries(recipe.ingredients).map(([ing, inp_rate]) => {
             return <div key={ing} className='cont'>
                 <Handle
@@ -50,10 +55,21 @@ function ResourceRecipe({ data, isConnectable }) {
             </div>
         });
 
-        let sec_name = recipe.name == data.name ? recipe.name2 : recipe.name;
-        if (sec_name) {
-            let sec_output = recipe.name == data.name ? recipe.output2 : recipe.output;
-            secondary_output_rate = sec_output * rcinfo.rate / output_rate;
+        if (recipe.extra_outputs) {
+            extra_outputs = recipe.extra_outputs
+                .filter(eo => eo.name !== data.name)
+                .map(eo => {
+                    let sec_rate = eo.amount * rcinfo.rate / output_rate;
+                    return <div key={eo.name} className='cont'>
+                        <Handle
+                            style={{ right: -30 }}
+                            id={'secondary-out-' + output_name}
+                            isConnectable={isConnectable}
+                            position={Position.Right}
+                            type='source' />
+                        <ResourceRate rcname={eo.name} rate={sec_rate} />
+                    </div>;
+                });
         }
     }
 
@@ -86,16 +102,7 @@ function ResourceRecipe({ data, isConnectable }) {
                             type='source' />
                         <ResourceRate rcname={output_name} rate={rcinfo.rate} />
                     </div>
-                    {secondary_output_rate &&
-                        <div className='cont'>
-                            <Handle
-                                style={{ right: -30 }}
-                                id={'secondary-out-' + output_name}
-                                isConnectable={isConnectable}
-                                position={Position.Right}
-                                type='source' />
-                            <ResourceRate rcname={recipe.name == data.name ? recipe.name2 : recipe.name} rate={secondary_output_rate} />
-                        </div>}
+                    {extra_outputs}
                 </div>
             </div>
             {machine_options.length > 1 && (
